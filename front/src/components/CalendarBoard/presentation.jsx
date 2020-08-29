@@ -6,16 +6,18 @@ import React from "react";
 import { GridList, Typography } from "@material-ui/core";
 
 import CalendarElement from "../CalendarElements";
-import { createCalendar } from "../../services/calendar";
 
 import * as styles from "./style.css";
 
-// カレンダーの配列を変数に格納
-const calendar = createCalendar();
 
 const days = ["日", "月", "火", "水", "木", "金", "土"];
 
-const CalendarBoard = () => {
+const CalendarBoard = ({
+    calendar,
+    month,
+    openAddScheduleDialog,
+    openCurrentScheduleDialog
+}) => {
     return (
         < div className={styles.container} >
             < GridList className={styles.grid} cols={7} spacing={0} cellHeight="auto" >
@@ -40,9 +42,14 @@ const CalendarBoard = () => {
                 {/* 日付を管理しているservices/calendarをマッピングして、「day」と言う名前で
             　　　　　CalendarElementに渡す */}
                 {
-                    calendar.map(c => (
-                        <li key={c.toISOString()}>
-                            <CalendarElement day={c} />
+                    calendar.map(({ date, schedules }) => (
+                        <li key={date.toISOString()} onClick={() => openAddScheduleDialog(date)}>
+                            <CalendarElement
+                                day={date}
+                                month={month}
+                                schedules={schedules}
+                                onClickSchedule={openCurrentScheduleDialog}
+                            />
                         </li>
                     ))
                 }
