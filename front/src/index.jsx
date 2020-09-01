@@ -8,8 +8,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 // storeを作成する際はこの二つをセットでimportする
+// 非同期処理を使う際はapplyMiddlewareをimportし、storeに登録
 import { Provider } from "react-redux";
-import { createStore } from "redux";
+import { createStore, applyMiddleware } from "redux";
+
+// redux-thunkが「普通のaction」か「thunk の action」かを判断
+import thunk from "redux-thunk";
 
 
 // DatePickerの導入
@@ -32,10 +36,9 @@ import "dayjs/locale/ja";
 dayjs.locale("ja");
 
 
-// rootReducerをimportし,
-// createStoreの引数に渡して、storeを作成する
+// storeを作成して、rootReducer、applyMiddlewareを登録
 import rootReducer from "./redux/rootReducer";
-const store = createStore(rootReducer);
+const store = createStore(rootReducer, applyMiddleware(thunk));
 
 
 const App = () => (

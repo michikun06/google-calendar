@@ -15,6 +15,7 @@ import {
 // 取得し他情報をカレンダーにセットするためのaction（dispatch関数）
 import { calendarSetMonth } from "../../redux/calendar/actions"
 
+import { asyncSchedulesFetchItem } from "../../redux/schedules/effects";
 
 // stateを取得してカレンダーに表示
 const mapStateToProps = state => ({ calendar: state.calendar });
@@ -26,6 +27,9 @@ const mapStateToProps = state => ({ calendar: state.calendar });
 const mapDispatchToProps = dispatch => ({
     setMonth: month => {
         dispatch(calendarSetMonth(month));
+    },
+    fetchItem: month => {
+        dispatch(asyncSchedulesFetchItem(month));
     }
 });
 
@@ -48,17 +52,20 @@ const mergeProps = (stateProps, dispatchProps) => ({
         // 取得した来月の月情報をmapDispatchToPropsの引数に渡し、
         // reducerの「calendarSetMonth」にdispatchする
         dispatchProps.setMonth(nextMonth)
+        dispatchProps.fetchItem(nextMonth);
     },
 
     setPreviousMonth: () => {
         const previousMonth = getPreviousMonth(stateProps.calendar);
         dispatchProps.setMonth(previousMonth);
+        dispatchProps.fetchItem(previousMonth);
     },
 
     setMonth: dayObj => {
         // dayjs → reduxのstate
         const month = formatMonth(dayObj);
         dispatchProps.setMonth(month);
+        dispatchProps.fetchItem(month);
     }
 
 });

@@ -2,7 +2,7 @@
 // CalendarBoardはカレンダー全体の構成や見た目を管理している
 // 
 
-import React from "react";
+import React, { useEffect } from "react";
 import { GridList, Typography } from "@material-ui/core";
 
 import CalendarElement from "../CalendarElements";
@@ -10,14 +10,22 @@ import CalendarElement from "../CalendarElements";
 import * as styles from "./style.css";
 
 
+// 曜日の配列
 const days = ["日", "月", "火", "水", "木", "金", "土"];
+
 
 const CalendarBoard = ({
     calendar,
     month,
     openAddScheduleDialog,
-    openCurrentScheduleDialog
+    openCurrentScheduleDialog,
+    fetchSchedule
 }) => {
+    // 初回のみdateをAPIから取得する
+    useEffect(() => {
+        fetchSchedule();
+    }, []);
+
     return (
         < div className={styles.container} >
             < GridList className={styles.grid} cols={7} spacing={0} cellHeight="auto" >
@@ -43,7 +51,10 @@ const CalendarBoard = ({
             　　　　　CalendarElementに渡す */}
                 {
                     calendar.map(({ date, schedules }) => (
-                        <li key={date.toISOString()} onClick={() => openAddScheduleDialog(date)}>
+                        <li
+                            key={date.toISOString()}
+                            onClick={() => openAddScheduleDialog(date)}
+                        >
                             <CalendarElement
                                 day={date}
                                 month={month}

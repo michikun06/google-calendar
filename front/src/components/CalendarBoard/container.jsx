@@ -25,6 +25,8 @@ import {
     currentScheduleOpenDialog
 } from "../../redux/currentSchedule/actions";
 
+// APIから情報を引っ張ってきてセットするためのaction
+import { asyncSchedulesFetchItem } from "../../redux/schedules/effects";
 
 // calendarと言う名前でstoreに設定したstate.calendarをpropsとして使うことができる
 const mapStateToProps = state => ({
@@ -45,8 +47,12 @@ const mapDispatchToProps = dispatch => ({
 
         dispatch(currentScheduleSetItem(schedule));
         dispatch(currentScheduleOpenDialog());
+    },
+
+    fetchSchedule: month => {
+        dispatch(asyncSchedulesFetchItem(month));
     }
-})
+});
 
 
 // 「mapStateToProps」と「mapDisapatchToProps」で生成されたpropsを引数にとり、
@@ -66,6 +72,8 @@ const mergeProps = (stateProps, dispatchProps) => {
     return {
         ...stateProps,
         ...dispatchProps,
+        // stateから現在の月の情報を取得して、fetchScheduleの引数としてセット
+        fetchSchedule: () => dispatchProps.fetchSchedule(month),
         calendar,
         month
     };

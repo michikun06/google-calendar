@@ -13,8 +13,9 @@ import {
     addScheduleSetValue
 } from "../../redux/addSchedule/actions"
 
+
 // Dialogでの入力内容をformに保存する関数をdispatchするためにactionから呼び出す
-import { schedulesAddItem } from "../../redux/schedules/actions";
+import { asyncSchedulesAddItem } from "../../redux/schedules/effects";
 
 
 // storeのaddScheduleをpresentationでprops.scheduleで呼び出せるように接続
@@ -33,7 +34,7 @@ const mapDispatchToProps = dispatch => ({
         dispatch(addScheduleSetValue(value));
     },
     saveSchedule: schedule => {
-        dispatch(schedulesAddItem(schedule));
+        dispatch(asyncSchedulesAddItem(schedule));
         dispatch(addScheduleCloseDialog());
     }
 })

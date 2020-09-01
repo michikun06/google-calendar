@@ -20,7 +20,7 @@ export const createCalendar = month => {
     const firstDayIndex = firstDay.day();
 
     // 月の初日の配列番号が０になるようにindex番号分だけ引いてreturn
-    return Array(35)
+    return Array(42)
         .fill(0)
         .map((_, i) => {
 

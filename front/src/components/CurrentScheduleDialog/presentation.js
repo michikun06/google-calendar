@@ -15,7 +15,12 @@ import {
 } from "@material-ui/core";
 
 // 上部右端の閉じるボタンと左側のアイコン素材
-import { Close, LocationOnOutlined, NotesOutlined } from "@material-ui/icons";
+import {
+    Close,
+    LocationOnOutlined,
+    NotesOutlined,
+    DeleteOutlineOutlined
+} from "@material-ui/icons";
 
 import styles from "./style.css";
 
@@ -26,7 +31,8 @@ const spacer = (top, bottom) => ({
 // 予定の詳細表示dialog
 const CurrentScheduleDialog = ({
     schedule: { item, isDialogOpen },
-    closeDialog
+    closeDialog,
+    deleteItem
 }) => {
     return (
         <Dialog open={isDialogOpen} onClose={closeDialog} maxWidth="xs" fullWidth>
@@ -34,6 +40,9 @@ const CurrentScheduleDialog = ({
             {/* Dialogを閉じるための×ボタン */}
             <DialogActions>
                 <div className={styles.closeButton}>
+                    <IconButton onClick={deleteItem} size="small">
+                        <DeleteOutlineOutlined />
+                    </IconButton>
                     <IconButton onClick={closeDialog} size="small">
                         <Close />
                     </IconButton>

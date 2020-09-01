@@ -13,7 +13,6 @@ import { IconButton, Toolbar, Typography, withStyles } from "@material-ui/core";
 import ArrowBackIos from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIos from "@material-ui/icons/ArrowForwardIos";
 import DehazeIcon from "@material-ui/icons/Dehaze";
-import { useState } from "react";
 
 
 // 一つ目の（）にはCSSを書き、2つ目の（）には適用したい部分の名前を書く
