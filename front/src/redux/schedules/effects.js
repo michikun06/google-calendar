@@ -1,56 +1,67 @@
-// apiにfetchする関数を呼び出すためのaction
-// ローディング状態にするための関数を呼び出すaction
 import {
     schedulesSetLoading,
     schedulesFetchItem,
     schedulesAddItem,
-    schedulesDeleteItem
+    schedulesDeleteItem,
+    schedulesAsyncFailure
 } from "./actions";
 
-// apiから指定のデータをJSON配列で受け取るための関数
-import { get, post, deleteRequest } from "../../services/api";
-
+import {
+    get,
+    post,
+    deleteRequest
+} from "../../services/api";
 
 import { formatSchedule } from "../../services/schedule";
 
+
+// 指定した月の予定の情報を取得する
 export const asyncSchedulesFetchItem = ({ month, year }) => async dispatch => {
+    dispatch(schedulesSetLoading)    //　loading状態にする
 
-    // isLoading:true
-    dispatch(schedulesSetLoading());
+    try {
+        const result = await get(`schedules?month=${month}&year=${year}`);  //指定した年月の予定を取得
+        const formatedSchedule = result.map(r => formatSchedule(r));        // データを所定の形に整形する
 
-    // 年と月の情報を取得してその月の情報をJSON配列として受け取る
-    // awaitで受け取っているため、非同期処理が終わるまで処理をブロックして、
-    // resultに入れている。また、返ってくるdate情報はISOStgring
-    const result = await get(`schedules?month=${month}&year=${year}`);
+        dispatch(schedulesFetchItem(formatedSchedule));　　　　　             //作成したデータを引数に与えてreducerを起動させる
+    } catch (err) {
+        console.error(err);
+        dispatch(schedulesAsyncFailure(err.message));
+    }
+}
 
-    // 配列内のdate情報をISOStgring　→　dayjsインスタンスに変換
-    const formatedSchedule = result.map(r => formatSchedule(r));
 
-    // 取得したデータをセットするためのdispatch関数（引数に正式なデータ）
-    dispatch(schedulesFetchItem(formatedSchedule));
+
+// 指定した月のscheduleに予定のオブジェクトを追加する
+export const asyncSchedulesAddItem = schedule => async dispatch => {
+    dispatch(schedulesSetLoading());                     // Loading : trueにする
+
+    try {
+        const body = { ...schedule, date: schedule.date.toISOString() };
+        const result = await post("schedules", body);
+
+        const newSchedule = formatSchedule(result);
+        dispatch(schedulesAddItem(newSchedule));
+    } catch (err) {
+        console.error(err);
+        dispatch(schedulesAsyncFailure(err.message));
+    }
 
 };
 
-export const asyncSchedulesAddItem = schedule => async dispatch => {
-    dispatch(schedulesSetLoading());
 
-    const body = { ...schedule, date: schedule.date.toISOString() };
-    const result = await post("schedules", body);
-
-    const newSchedule = formatSchedule(result);
-    dispatch(schedulesAddItem(newSchedule));
-}
-
+// 指定した月の、指定したidの予定を削除する
 export const asyncSchedulesDeleteItem = id => async (dispatch, getState) => {
-    dispatch(schedulesSetLoading);
+    dispatch(schedulesSetLoading())          //Loading状態にする
     const currentSchedules = getState().schedules.items;
 
-    await deleteRequest(`schedules/${id}`);
-    const newSchedules = currentSchedules.filter(s => s.id !== id);
-    dispatch(schedulesDeleteItem(newSchedules));
+    try {
+        await deleteRequest(`schedules/${id}`);
+
+        const newSchedules = currentSchedules.filter(s => s.id !== id);  //消したい予定を取り除いて新たな配列を作成
+        dispatch(schedulesDeleteItem(newSchedules));
+    } catch (err) {
+        console.error(err);
+        dispatch(schedulesAsyncFailure(err.message));
+    }
 }
-
-
-
-
-

@@ -1,59 +1,77 @@
-// 
-// ダイアログの開閉、formの更新のreducerをpresentation.jsで
-// 操作できるようにするためのロジック作成
-// 
-
-import { connect } from "react-redux";
 import AddScheduleDialog from "./presentation";
+import { connect } from "react-redux";
 
-// Dialogを閉じるための関数をactionから呼び出す
-// 入力内容をformに保存するための関数をactionから呼び出す
+
+// reducerを起動させるためのactionを追加
 import {
     addScheduleCloseDialog,
-    addScheduleSetValue
-} from "../../redux/addSchedule/actions"
+    addScheduleSetValue,
+    addScheduleStartEdit
+} from "../../redux/addSchedule/actions";
 
-
-// Dialogでの入力内容をformに保存する関数をdispatchするためにactionから呼び出す
 import { asyncSchedulesAddItem } from "../../redux/schedules/effects";
 
+// 確認画面
+import { isCloseDialog } from "../../services/schedule";
 
-// storeのaddScheduleをpresentationでprops.scheduleで呼び出せるように接続
-const mapStateToProps = state => ({
-    schedule: state.addSchedule
-})
 
-// dialogを閉じるためのaddScheduleCloseDialogをactionから持ってきて、
-// props.closeDialogでreducerにdispatchするための設定
-// props.setScheduleでformを作成し、入力内容(value)を保存するためのactionをreducerにdispatch
+
+
+
+const mapStateToProps = state => ({ schedule: state.addSchedule })
+
+
 const mapDispatchToProps = dispatch => ({
+
+    // 「×」ボタンor周囲がクリックされた時にDialogを閉じるための関数
     closeDialog: () => {
-        dispatch(addScheduleCloseDialog());
+        dispatch(addScheduleCloseDialog())
     },
+
+    // Dialogへの入力内容を展開し表示するための関数
     setSchedule: value => {
-        dispatch(addScheduleSetValue(value));
+        dispatch(addScheduleSetValue(value))
     },
+
+    // 保存ボタンが押された時に実行される関数（storeのstateに保存＆Dialogを閉じる）
     saveSchedule: schedule => {
-        dispatch(asyncSchedulesAddItem(schedule));
-        dispatch(addScheduleCloseDialog());
+        dispatch(asyncSchedulesAddItem(schedule))
+        dispatch(addScheduleCloseDialog())
+    },
+
+    // dialogが空欄の時に発動させるdispatch関数
+    setIsEditStart: () => {
+        dispatch(addScheduleStartEdit())
     }
 })
 
+const mergeProps = (stateProps, dispatchProps) => {
+    const {
+        schedule: { form: schedule }
+    } = stateProps;
 
-// scheduleにmapStateToPropsの内容を保存してformに保存するdispatch関数に引数として渡している
-const mergeProps = (stateProps, dispatchProps) => ({
-    ...stateProps,
-    ...dispatchProps,
-    saveSchedule: () => {
-        const {
-            schedule: { form: schedule }
-        } = stateProps;
-        dispatchProps.saveSchedule(schedule);
+    const { saveSchedule, closeDialog } = dispatchProps
+
+    return {
+        ...stateProps,
+        ...dispatchProps,
+        saveSchedule: () => {
+            saveSchedule(schedule);
+        },
+        closeDialog: () => {
+            if (isCloseDialog(schedule)) {
+                closeDialog();
+            }
+        }
     }
-});
+};
 
 export default connect(
     mapStateToProps,
     mapDispatchToProps,
     mergeProps
 )(AddScheduleDialog);
+
+
+
+

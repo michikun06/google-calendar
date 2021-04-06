@@ -1,30 +1,16 @@
-// 
-// reducerをstoreに渡すために、全reducerを一つにまとめて"src/index.js"に渡す
-// 役割を担う。
-// 
-
-
-// combineReducersを使うことで複数のreducerを一つにまとめることができる
 import { combineReducers } from "redux";
 
-// 全てのreducerをimportする
+// reducerをimport
 import calendarReducer from "./calendar/reducer";
 import addScheduleReducer from "./addSchedule/reducer";
 import schedulesReducer from "./schedules/reducer";
 import currentScheduleReducer from "./currentSchedule/reducer";
 
-
-
-// storeに接続するために一つにまとめるためのrootReducer
-// importしたreducerそれぞれに名前をつけて一つにまとめる
-// これがのちにmapStateToPropsで「state.calendar」で呼び出すことができる
 const rootReducer = combineReducers({
-    calendar: calendarReducer,
-    addSchedule: addScheduleReducer,
-    currentSchedule: currentScheduleReducer,
-    schedules: schedulesReducer
+    calendar: calendarReducer,                // APIから持ってきた暦データを作成した配列の展開してカレンダーを作成
+    addSchedule: addScheduleReducer,          // 入力する際のDialogの開閉、入力formの展開を行う
+    schedules: schedulesReducer,              // ユーザーの入力内容をstateに保存
+    currentSchedule: currentScheduleReducer   // ユーザーが作成した予定を表示、また表示専用のdialogの開閉
 });
 
-
-// rootReducerを「src / index.js」で受け取り,storeに渡される
 export default rootReducer;

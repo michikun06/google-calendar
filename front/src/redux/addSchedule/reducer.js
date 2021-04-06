@@ -1,15 +1,14 @@
 import {
     ADD_SCHEDULE_SET_VALUE,
     ADD_SCHEDULE_OPEN_DIALOG,
-    ADD_SCHEDULE_CLOSE_DIALOG
+    ADD_SCHEDULE_CLOSE_DIALOG,
+    ADD_SCHEDULE_START_EDIT
 } from "./actions";
+
 import dayjs from "dayjs";
 
 
-
-
-// ダイアログで管理する項目の初期値を設定（データが格納されている「form」と
-// ダイアログが開いているか判断する「isDialogOpen」）
+// ユーザーの入力内容、ダイアログの開閉、文字入力の有無をstateで管理
 const init = {
     form: {
         title: "",
@@ -17,35 +16,41 @@ const init = {
         date: dayjs(),
         location: ""
     },
-    isDialogOpen: false
+    isDialogOpen: false,       // ダイアログ開閉の有無
+    isStartEdit: false         // 文字が入力されているかの有無
 }
-
-
-// action.type別に「formの更新」、「Dialogの開閉」の処理を実行し
-// returnでstoreのstateを更新させる
 
 const addScheduleReducer = (state = init, action) => {
     const { type, payload } = action;
 
+    // action createrの指示ごとに処理を分岐
     switch (type) {
 
-        // formの内容をユーザーの入力内容に更新する
-        // ※現状のformの内容は消さない、stateに新たなformを作成して
-        // 　入力した項目だけが更新される仕組み
-        case ADD_SCHEDULE_SET_VALUE:
-            return { ...state, form: { ...state.form, ...payload } };
 
-        // state配列のisDialogOpenをtrueにする
+        // 現在のstateを展開して渡ってきたformデータを上書きした値を返す
+        case ADD_SCHEDULE_SET_VALUE:
+            return { ...state, form: { ...state.form, ...payload } }
+
+
+        // 現在のstateを展開して、isDialogOpenをtueに上書きした値を返す
         case ADD_SCHEDULE_OPEN_DIALOG:
             return { ...state, isDialogOpen: true };
 
-        // state配列のisDialogOpenをfalseにする
-        case ADD_SCHEDULE_CLOSE_DIALOG:
-            return init;
 
+        // isDialogOpenをfalseの初期値をそのまま返す
+        case ADD_SCHEDULE_CLOSE_DIALOG:
+            return init
+
+
+        // 文字が入力されたら合図を出す
+        case ADD_SCHEDULE_START_EDIT:
+            return { ...state, isStartEdit: true }
+
+
+        // 現在の値をそのまま返す
         default:
             return state;
     }
-};
+}
 
 export default addScheduleReducer;

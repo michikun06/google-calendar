@@ -1,21 +1,14 @@
-// 
-// Toolbarの見た目を担っているコンポーネント
-// 
+import React, { useState } from "react";
 
-import React from "react";
-
-// 小さなカレンダーDatePickerをimport
 import { DatePicker } from "@material-ui/pickers";
 
+import { IconButton, Toolbar, Typography, withStyles, Tooltip } from "@material-ui/core";
 
-// Toolbarに必要な素材をimport
-import { IconButton, Toolbar, Typography, withStyles } from "@material-ui/core";
 import ArrowBackIos from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIos from "@material-ui/icons/ArrowForwardIos";
 import DehazeIcon from "@material-ui/icons/Dehaze";
 
 
-// 一つ目の（）にはCSSを書き、2つ目の（）には適用したい部分の名前を書く
 const StyledToolbar = withStyles({
     root: { padding: "0" }
 })(Toolbar);
@@ -28,48 +21,49 @@ const StyledDatePicker = withStyles({
     root: { marginLeft: 30 }
 })(DatePicker);
 
-
-
 const Navigation = ({ setNextMonth, setPreviousMonth, setMonth, month }) => {
 
     return (
         <StyledToolbar>
 
-            {/* 一番左のメニューボタン */}
+            {/* メニューボタン */}
             <IconButton>
                 <DehazeIcon />
             </IconButton>
 
-            {/* 左から2番目カレンダーの画像 */}
+            {/* カレンダーの画像 */}
             <img src="/images/calendar_icon.png" width="40" height="40" />
 
-            {/* カレンダー */}
+            {/* 「カレンダー」の文字 */}
             <StyledTypography color="textSecondary" variant="h5" component="h1">
                 カレンダー
             </StyledTypography>
 
-            {/* 先月への切り替えボタン */}
-            <IconButton size="small" onClick={setPreviousMonth}>
-                <ArrowBackIos />
-            </IconButton>
+            {/* 前月へ戻るボタン */}
+            <Tooltip title="前の月へ" placement="bottom">
+                <IconButton size="small" onClick={setPreviousMonth}>
+                    <ArrowBackIos />
+                </IconButton>
+            </Tooltip>
 
-            {/* 来月への切り替えボタン */}
-            <IconButton size="small" onClick={setNextMonth}>
-                <ArrowForwardIos />
-            </IconButton>
+            {/* 次月へ進むボタン */}
+            <Tooltip title="次の月へ" placement="bottom">
+                <IconButton size="small" onClick={setNextMonth}>
+                    <ArrowForwardIos />
+                </IconButton>
+            </Tooltip>
 
-            {/* DatePickerを表示ボタン */}
             <StyledDatePicker
                 value={month}
                 onChange={setMonth}
                 variant="inline"
-                format="YYYY年MM月"
-                animateYearScrolling
+                format="YYYY年M月"
+                animateYearScrolling={false}
                 disableToolbar
             />
 
         </StyledToolbar>
-    );
+    )
 };
 
 export default Navigation;

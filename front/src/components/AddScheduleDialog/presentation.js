@@ -1,12 +1,4 @@
-// 
-// このファイルは予定追加のDialogのView部分を担っている
-// 「isDialogOpen: true」で見えるようになる
-// 
-
 import React from "react";
-
-
-// 素材をimport
 import {
     Dialog,
     DialogContent,
@@ -15,11 +7,11 @@ import {
     Button,
     Input,
     Grid,
-    IconButton
+    IconButton,
+    Typography,
+    Tooltip
 } from "@material-ui/core";
 
-
-// Dialogの入力蘭左のアイコンマーク、また右上の×ボタンマーク
 import {
     LocationOnOutlined,
     NotesOutlined,
@@ -27,67 +19,71 @@ import {
     Close
 } from "@material-ui/icons";
 
-
-// 閉じるボタンを上部右端に実装するためのcssを適用する
 import * as styles from "./style.css";
 
-
-// 小さなカレンダー
 import { DatePicker } from "@material-ui/pickers";
 
-
 import { withStyles } from "@material-ui/styles";
+
 
 const spacer = { margin: "4px 0" };
 
 const Title = withStyles({
-    root: { marginBottom: 32, fontSize: 22 }
+    root: { fontSize: 22 }
 })(Input);
 
 
-// stateのisDialogOpenをダイアログに接続することで開閉できるようになる
 const AddScheduleDialog = ({
     schedule: {
         form: { title, location, description, date },
-        isDialogOpen
+        isDialogOpen,
+        isStartEdit
     },
     closeDialog,
     setSchedule,
-    saveSchedule
+    saveSchedule,
+    setIsEditStart
 }) => {
+
+    const isTitleInvalid = !title && isStartEdit;      //  title === ""かつ、isStartEdit=== falseのときにエラー
+
     return (
         <Dialog open={isDialogOpen} onClose={closeDialog} maxWidth="xs" fullWidth>
 
-            {/* 上部右端閉じるボタン */}
+            {/* 閉じるボタン */}
             <DialogActions>
                 <div className={styles.closeButton}>
-                    <IconButton onClick={closeDialog} size="small">
-                        <Close />
-                    </IconButton>
+                    <Tooltip title="閉じる" placement="bottom">
+                        <IconButton onClick={closeDialog} size="small">
+                            <Close />
+                        </IconButton>
+                    </Tooltip>
                 </div>
             </DialogActions>
 
-
             <DialogContent>
 
-                {/* Dialogのタイトル部分 */}
-                {/* 
-                ユーザーがTitleを入力　
-                　　　　　　↓
-                引数に入力内容を入れて、dispatch関数setScheduleが作動
-                　　　　　　↓
-                Titleのvalueが更新される 
-                */}
+                {/* タイトル入力蘭 */}
                 <Title
                     autoFocus
                     fullWidth
                     placeholder="タイトルと日時を追加"
                     value={title}
                     onChange={e => setSchedule({ title: e.target.value })}
+                    onBlur={setIsEditStart}        // フォーカスが外れたタイミングでisStartEdit:trueにするdispatch関数を呼び出し
+                    error={isTitleInvalid}
                 />
+                <div className={styles.validation}>　　　{/* エラー認定されたときにのみ表示される */}
+                    {isTitleInvalid && (
+                        <Typography variant="caption" color="error">
+                            タイトルは必須です。
+                        </Typography>
+                    )}
+                </div>
 
 
-                {/* Dialog画面からDatePickerを用いて日付指定 */}
+
+                {/* 日程を追加 */}
                 <Grid container spacing={1} alignItems="center" justyfy="space-between">
                     <Grid item>
                         <AccessTime />
@@ -96,6 +92,7 @@ const AddScheduleDialog = ({
                         <DatePicker
                             value={date}
                             onChange={d => setSchedule({ date: d })}
+                            style={spacer}
                             variant="inline"
                             format="YYYY年M月D日"
                             animateYearScrolling
@@ -106,9 +103,7 @@ const AddScheduleDialog = ({
                     </Grid>
                 </Grid>
 
-
-                {/* Dialogの位置情報入力部分 */}
-                {/* dispatch関数の作動についてはTitleと同様 */}
+                {/* 位置情報入力蘭 */}
                 <Grid container spacing={1} alignItems="center" justyfy="space-between">
                     <Grid item>
                         <LocationOnOutlined />
@@ -124,9 +119,7 @@ const AddScheduleDialog = ({
                     </Grid>
                 </Grid>
 
-
-                {/* Dialogの説明入力部分 */}
-                {/* dispatch関数の作動についてはTitleと同様 */}
+                {/* 説明入力蘭 */}
                 <Grid container spacing={1} alignItems="center" justyfy="space-between">
                     <Grid item>
                         <NotesOutlined />
@@ -136,23 +129,28 @@ const AddScheduleDialog = ({
                             style={spacer}
                             fullWidth
                             placeholder="説明を追加"
-                            value={description}
+                            valule={description}
                             onChange={e => setSchedule({ description: e.target.value })}
                         />
                     </Grid>
                 </Grid>
+
             </DialogContent>
 
             {/* 保存ボタン */}
             <DialogActions>
-                <Button color="primary" variant="outlined" onClick={saveSchedule}>
+                <Button
+                    onClick={saveSchedule}
+                    color="primary"
+                    variant="outlined"
+                    disabled={!title}
+                >
                     保存
                 </Button>
             </DialogActions>
 
         </Dialog>
-    );
-};
-
+    )
+}
 
 export default AddScheduleDialog;

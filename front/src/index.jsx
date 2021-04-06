@@ -1,53 +1,46 @@
-// 
-// reactで作成したものをHTML形式に変換して、index.htmlに全データを渡す
-// 働きを担う。
-// 
-
-
 import React from "react";
 import ReactDOM from "react-dom";
 
-// storeを作成する際はこの二つをセットでimportする
-// 非同期処理を使う際はapplyMiddlewareをimportし、storeに登録
+// redux使用に必要な二つをimport
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware } from "redux";
 
-// redux-thunkが「普通のaction」か「thunk の action」かを判断
+// 非同期処理に必要なライブラリを追加
 import thunk from "redux-thunk";
 
-
-// DatePickerの導入
 import DayjsUtils from "@date-io/dayjs";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 
 
-// 表示するためのcomponentである。connect後のファイルをimportすることに気をつける
+// 日本時間に設定してdayjsを使用
+import dayjs, { Dayjs } from "dayjs";
+import "dayjs/locale/ja";
+dayjs.locale("ja")
+
+
+// reducerをまとめたrootReducerをimport
+import rootReducer from "./redux/rootReducer";
+
+// 必要なcomponentをimport
 import CalendarBoard from "./components/CalendarBoard/container";
-import Navigation from "./components/Nvigation/container";
+import Navigation from "./components/Navigation/container";
 import AddScheduleDialog from "./components/AddScheduleDialog/container";
 import CurrentScheduleDialog from "./components/CurrentScheduleDialog/container";
+import ErrorSnackbar from "./components/ErrorSnackbar/container";
 
 
-
-
-// dayjsを日本時刻で使うための設定
-import dayjs from "dayjs";
-import "dayjs/locale/ja";
-dayjs.locale("ja");
-
-
-// storeを作成して、rootReducer、applyMiddlewareを登録
-import rootReducer from "./redux/rootReducer";
+// reducerと非同期処理が使えるようにしてstoreを作成
 const store = createStore(rootReducer, applyMiddleware(thunk));
 
-
+// ページ全体のJSXをHTMLに変換させて表示している
 const App = () => (
     <Provider store={store}>
-        <MuiPickersUtilsProvider utils={DayjsUtils} >
+        <MuiPickersUtilsProvider utils={DayjsUtils}>
             <Navigation />
             <CalendarBoard />
             <AddScheduleDialog />
             <CurrentScheduleDialog />
+            <ErrorSnackbar />
         </MuiPickersUtilsProvider>
     </Provider>
 );
